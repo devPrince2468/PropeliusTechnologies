@@ -149,4 +149,27 @@ export const todoService = {
       );
     }
   },
+  getTodosDueToday: async (userId: unknown) => {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const todos = await Todo.find({
+        user: userId,
+        dueDate: { $gte: today, $lt: tomorrow },
+      });
+
+      if (!todos || todos.length === 0) {
+        throw new AppError("No todos due today", 404);
+      }
+      return todos;
+    } catch (error) {
+      throw new AppError(
+        error.message || "Error fetching todos due today",
+        500
+      );
+    }
+  },
 };
